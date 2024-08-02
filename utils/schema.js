@@ -7,6 +7,18 @@ export const MockInterview = pgTable("mockInterview", {
   jobDesc: varchar("jobDesc").notNull(),
   jobExperience: varchar("jobExperience").notNull(),
   createdBy: varchar("createdBy").notNull(),
-  createdAt: varchar("createdAt"),
+  createdAt: varchar("createdAt").notNull(),
   mockId: varchar("mockId").notNull(),
+});
+
+export const UserAnswer = pgTable("userAnswer", {
+  id: serial("id").primaryKey(),
+  mockIdRef: varchar("mockId").notNull(),
+  question: varchar("question").notNull(),
+  correctAns: text("correctAns").notNull(),
+  userAns: text("userAns"),
+  feedback: text("feedback"),
+  rating: varchar("rating"),
+  userEmail: varchar("useremail"),
+  createdAt: varchar("createdAt"),
 });

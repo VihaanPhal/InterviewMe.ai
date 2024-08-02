@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,32 +11,80 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
+import { chatSession } from "@/utils/GeminiAiModel";
+import { LoaderCircle } from "lucide-react";
+import { db } from "@/utils/db";
+import { MockInterview } from "@/utils/schema";
+import { v4 as uuidv4 } from "uuid";
+import { useUser } from "@clerk/nextjs";
+import moment from "moment";
+import { useRouter } from "next/navigation";
 const AddNewInterview = () => {
   const [openD, setOpenD] = useState(false);
-  const [jobPosition, setJobPosition] = useState();
-  const [jobDesc, setDesc] = useState();
-  const [jobExperience, setJobExperience] = useState();
+  const [jobPosition, setJobPosition] = useState("");
+  const [jobDesc, setDesc] = useState("");
+  const [jobExperience, setJobExperience] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [jsonResp, setjsonResp] = useState(false);
+  const { user } = useUser();
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
-    // Handle form submission here, e.g., send data to your server
-    // You can validate and process the form data here before closing the dialog
     console.log(jobPosition, jobDesc, jobExperience);
     const InputPrompt =
-      "You are an AI assistant designed to conduct job interviews based on the provided job description, job position, and years of experience. The interview should start with an introductory question, followed by a behavioral question, and then three technical questions tailored to the skills mentioned in the job description. The difficulty of the technical questions should be proportional to the years of experience. Give result in json format GIve total of " +
-      process.env.NEXT_PUBLIC_COUNT +
-      ".Job Position: " +
+      "You are an AI assistant designed to conduct job interviews based on the provided job description, job position, and years of experience. The interview should start with an introductory question, followed by a behavioral question, and then three technical questions tailored to the skills mentioned in the job description. The difficulty of the technical questions should be proportional to the years of experience. Give result in JSON format and include the answers. Give a total of 5 questions. Job Position: " +
       jobPosition +
-      ",Description: " +
+      ", Description: " +
       jobDesc +
       ", Years of Experience: " +
-      jobExperience;
+      jobExperience +
+      ". Give the answer according to you too. Provide the JSON response in the following format: " +
+      JSON.stringify([
+        { Question: "give questions", Answer: "give answer" },
+        { Question: "give questions", Answer: "give answer" },
+        { Question: "give questions", Answer: "give answer" },
+        { Question: "give questions", Answer: "give answer" },
+        { Question: "give questions", Answer: "give answer" },
+      ]);
 
-    
+    try {
+      const result = await chatSession.sendMessage(InputPrompt);
+      const responseText = await result.response.text();
+      const mockJsonResp = result.response
+        .text()
+        .replace("```json", "")
+        .replace("```", "");
+      console.log(JSON.parse(mockJsonResp));
+      setjsonResp(mockJsonResp);
 
+      if (mockJsonResp) {
+        const resp = await db
+          .insert(MockInterview)
+          .values({
+            mockId: uuidv4(),
+            jsonMockResp: mockJsonResp,
+            jobPosition: jobPosition,
+            jobDesc: jobDesc,
+            jobExperience: jobExperience,
+            createdBy: user?.primaryEmailAddress?.emailAddress,
+            createdAt: moment().format("DD-MM-yyyy"),
+          })
+          .returning({ mockId: MockInterview.mockId });
+        console.log("inserted ID", resp);
+        if (resp) {
+          setOpenD(false);
+          router.push("/dashboard/interview/" + resp[0]?.mockId);
+        }
+      } else {
+        console.log("ERROR");
+      }
 
-    setOpenD(false);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error generating interview content:", error);
+    }
   };
 
   return (
@@ -114,7 +161,16 @@ const AddNewInterview = () => {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit">Start Interview</Button>
+                  <Button type="submit" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <LoaderCircle className="animate-spin" />
+                        Generating from AI
+                      </>
+                    ) : (
+                      "Start Interview"
+                    )}
+                  </Button>
                 </div>
               </DialogDescription>
             </DialogHeader>
