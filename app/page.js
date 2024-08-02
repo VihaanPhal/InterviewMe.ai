@@ -22,7 +22,7 @@ export default function Home() {
             onClick={() =>
               (window.location.href = "https://vihaanphal.vercel.app")
             }
-            className="text-white hover:text-gray-400"
+            className="text-white bg-black transition-all hover:text-black hover:bg-gradient-to-r hover:from-green-200 hover:via-blue-200 hover:to-purple-200"
           >
             Meet the Creator
           </Button>
@@ -56,7 +56,11 @@ export default function Home() {
             <div className="text-center md:text-left mb-4 md:mb-0">
               <h2 className="text-lg font-bold mb-2">Contact Me</h2>
               <p>Email: phal.vihaan@gmail.com</p>
-              <p>Phone: (623) 800-3505</p>
+              <a href="https://vihaanphal.vercel.app">
+                <Button className="hover:bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 hover:font-bold transition-all">
+                  Visit Portfolio
+                </Button>
+              </a>
             </div>
             <div className="flex space-x-4">
               <a
@@ -69,13 +73,14 @@ export default function Home() {
                   alt="Instagram"
                   width={40}
                   height={40}
-                  className="rounded-full"
+                  className="rounded-full transition-all transform hover:scale-110"
                 />
               </a>
               <a
                 href="https://www.linkedin.com/in/VihaanPhal"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="rounded-full transition-all transform hover:scale-110"
               >
                 <Image
                   src="/linkedin.png"
@@ -95,7 +100,7 @@ export default function Home() {
                   alt="GitHub"
                   width={40}
                   height={40}
-                  className="rounded-full"
+                  className="rounded-full transition-all transform hover:scale-110"
                 />
               </a>
             </div>
