@@ -3,22 +3,26 @@ import { db } from "@/utils/db";
 import { MockInterview } from "@/utils/schema";
 import React, { useEffect, useState } from "react";
 import { eq } from "drizzle-orm";
-import { Lightbulb, WebcamIcon } from "lucide-react";
-import Webcam from "react-webcam";
+import { Lightbulb, WebcamIcon, CircleStop, Mic } from "lucide-react";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+// Dynamically import the Webcam component to ensure it only renders on the client side
+const Webcam = dynamic(() => import("react-webcam"), { ssr: false });
+
 const Interview = ({ params }) => {
-  const [interviewData, setInterviewData] = useState(null); // Initialize with null
-  const [loading, setLoading] = useState(true); // Loading state
+  const [interviewData, setInterviewData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [webcamEnabled, setWebcamEnabled] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     console.log(params.interviewId);
     GetInterviewDetails();
+    setIsClient(true);
   }, []);
 
-  /**getting inteview details by mockID/InterviewId */
   const GetInterviewDetails = async () => {
     try {
       const result = await db
@@ -35,31 +39,34 @@ const Interview = ({ params }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="my-10 ">
-      <h2 className="font-bold text-2xl">Let's Get Started</h2>
+    <div className="my-10 mx-5 md:mx-20">
+      <h2 className="font-bold text-2xl mb-5">Let's Get Started</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {interviewData && (
           <div className="flex flex-col my-5 gap-5">
-            <div className="flex flex-col rounded-lg border  p-5 ">
-              <h2 className="text-lg">
+            <div className="flex flex-col rounded-lg border p-5 bg-white shadow-sm">
+              <h2 className="text-lg mb-2">
                 <strong>Job Role/Job Position:</strong>{" "}
                 {interviewData.jobPosition}
               </h2>
-              <h2 className="text-lg">
+              <h2 className="text-lg mb-2">
                 <strong>Job Description:</strong> {interviewData.jobDesc}
               </h2>
               <h2 className="text-lg">
                 <strong>Experience:</strong> {interviewData.jobExperience}
               </h2>
             </div>
-            <div className="p-5 border rounded-lg border-yellow-300 bg-yellow-100">
-              <h2 className="flex ga-2 items-center text-yellow-400">
+            <div className="p-5 border rounded-lg border-yellow-300 bg-yellow-100 shadow-sm">
+              <h2 className="flex items-center text-yellow-400 gap-2">
                 <Lightbulb />
-
                 <strong>Information</strong>
               </h2>
               <h2 className="mt-3 text-yellow-500">
@@ -68,28 +75,50 @@ const Interview = ({ params }) => {
             </div>
           </div>
         )}
-        <div className="">
-          {webcamEnabled ? (
-            <Webcam
-              onUserMedia={() => setWebcamEnabled(true)}
-              onUserMediaError={() => setWebcamEnabled(false)}
-              mirrored={true}
-              style={{
-                height: 300,
-                width: 300,
-              }}
-            />
-          ) : (
-            <>
-              <WebcamIcon className="h-72 my-7 w-full p-20 bg-secondary rounded-lg border" />
-              <Button variant="ghost" onClick={() => setWebcamEnabled(true)}>
-                Enable Webcam and Microphone
-              </Button>
-            </>
+        <div className="flex flex-col items-center">
+          {isClient && (
+            <div className="relative flex justify-center items-center bg-gray-800 rounded-lg overflow-hidden w-full h-72">
+              {webcamEnabled ? (
+                <Webcam
+                  mirrored={true}
+                  className="absolute z-20 border-8 border-black rounded-lg"
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                    objectFit: "cover",
+                  }}
+                  onUserMedia={() => console.log("Webcam accessed")}
+                  onUserMediaError={(error) =>
+                    console.error("Webcam error", error)
+                  }
+                />
+              ) : (
+                <div className="absolute z-10 flex flex-col items-center justify-center w-full h-full bg-gray-800">
+                  <WebcamIcon className="h-20 w-20 text-gray-500" />
+                </div>
+              )}
+            </div>
           )}
+          <Button
+            variant="outline"
+            className="mt-5"
+            onClick={() => setWebcamEnabled(!webcamEnabled)}
+          >
+            {webcamEnabled ? (
+              <div className="flex items-center space-x-2">
+                <CircleStop className="w-5 h-5 text-red-600" />
+                <span>Disable Webcam and Microphone</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Mic className="w-5 h-5 text-green-600" />
+                <span>Enable Webcam and Microphone</span>
+              </div>
+            )}
+          </Button>
         </div>
       </div>
-      <div className="flex justify-end items-end">
+      <div className="flex justify-end mt-10">
         <Link href={"/dashboard/interview/" + params.interviewId + "/start"}>
           <Button>Start Interview</Button>
         </Link>
