@@ -11,14 +11,15 @@ export default function Signup() {
       <section className="flex-1 flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 opacity-40 blur-md"></div>
         <div className="container mx-auto px-4 text-center py-20 relative z-10 flex flex-col items-center">
-          <h2 className="text-4xl font-extrabold mb-4">Create Your Account</h2>
-          <p className="text-lg mb-8">
+          <h2 className="text-4xl font-extrabold mb-4 sm:text-3xl md:text-5xl">
+            Create Your Account
+          </h2>
+          <p className="text-lg mb-8 sm:text-base md:text-xl">
             Sign up to get started with mock interviews and personalized
             feedback.
           </p>
-          <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
-            <SignUp />
-          </div>
+
+          <SignUp />
         </div>
       </section>
     </div>

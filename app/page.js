@@ -6,10 +6,14 @@ import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isFooterVisible, setIsFooterVisible] = useState(false);
 
   const handleSignup = () => {
     router.push("/dashboard");
+  };
+
+  const toggleFooter = () => {
+    setIsFooterVisible(!isFooterVisible);
   };
 
   return (
@@ -18,14 +22,22 @@ export default function Home() {
       <header className="py-4 border-b border-gray-700">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">InterviewMe.AI</h1>
-          <Button
-            onClick={() =>
-              (window.location.href = "https://vihaanphal.vercel.app")
-            }
-            className="text-white bg-black transition-all hover:text-black hover:bg-gradient-to-r hover:from-green-200 hover:via-blue-200 hover:to-purple-200"
-          >
-            Meet the Creator
-          </Button>
+          <div className="flex space-x-4 items-center">
+            <Button
+              onClick={() =>
+                (window.location.href = "https://vihaanphal.vercel.app")
+              }
+              className="text-white bg-black transition-all hover:text-black hover:bg-gradient-to-r hover:from-green-200 hover:via-blue-200 hover:to-purple-200"
+            >
+              Meet the Creator
+            </Button>
+            <Button
+              onClick={toggleFooter}
+              className="text-white bg-black transition-all hover:text-black hover:bg-gray-700 md:hidden"
+            >
+              {isFooterVisible ? "Hide Info" : "Show Info"}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -50,17 +62,16 @@ export default function Home() {
       </section>
 
       {/* Footer Section */}
-      <footer className="py-10 border-t border-gray-700">
+      <footer
+        className={`py-6 md:py-4 border-t border-gray-700 text-sm md:text-xs ${
+          isFooterVisible ? "block" : "hidden md:block"
+        }`}
+      >
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between mb-6">
             <div className="text-center md:text-left mb-4 md:mb-0">
               <h2 className="text-lg font-bold mb-2">Contact Me</h2>
               <p>Email: phal.vihaan@gmail.com</p>
-              <a href="https://vihaanphal.vercel.app">
-                <Button className="hover:bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 hover:font-bold transition-all">
-                  Visit Portfolio
-                </Button>
-              </a>
             </div>
             <div className="flex space-x-4">
               <a
@@ -71,8 +82,8 @@ export default function Home() {
                 <Image
                   src="/instagram.png"
                   alt="Instagram"
-                  width={40}
-                  height={40}
+                  width={32}
+                  height={32}
                   className="rounded-full transition-all transform hover:scale-110"
                 />
               </a>
@@ -85,8 +96,8 @@ export default function Home() {
                 <Image
                   src="/linkedin.png"
                   alt="LinkedIn"
-                  width={40}
-                  height={40}
+                  width={32}
+                  height={32}
                   className="rounded-full"
                 />
               </a>
@@ -98,8 +109,8 @@ export default function Home() {
                 <Image
                   src="/github-white.png"
                   alt="GitHub"
-                  width={40}
-                  height={40}
+                  width={32}
+                  height={32}
                   className="rounded-full transition-all transform hover:scale-110"
                 />
               </a>

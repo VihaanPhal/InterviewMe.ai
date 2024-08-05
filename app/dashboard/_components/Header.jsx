@@ -28,7 +28,7 @@ const Header = () => {
           Dashboard
         </li>
         <li
-className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 hover:font-bold transition-all
+          className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 hover:font-bold transition-all
 
           ${path == "/dashboard/questions" && "text-primary font-bold"}
         `}
@@ -36,7 +36,7 @@ className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r fro
           Questions
         </li>
         <li
-className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 hover:font-bold transition-all
+          className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 hover:font-bold transition-all
 
           ${path == "/dashboard/upgrade" && "text-primary font-bold"}
         `}
