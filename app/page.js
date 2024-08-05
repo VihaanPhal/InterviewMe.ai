@@ -2,18 +2,12 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
-  const [isFooterVisible, setIsFooterVisible] = useState(false);
 
   const handleSignup = () => {
     router.push("/dashboard");
-  };
-
-  const toggleFooter = () => {
-    setIsFooterVisible(!isFooterVisible);
   };
 
   return (
@@ -21,7 +15,9 @@ export default function Home() {
       {/* Header Section */}
       <header className="py-4 border-b border-gray-700">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">InterviewMe.AI</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-green-200 via-blue-200 to-purple-200 text-transparent bg-clip-text animate-gradient">
+            InterviewMe.AI
+          </h1>
           <div className="flex space-x-4 items-center">
             <Button
               onClick={() =>
@@ -31,12 +27,6 @@ export default function Home() {
             >
               Meet the Creator
             </Button>
-            <Button
-              onClick={toggleFooter}
-              className="text-white bg-black transition-all hover:text-black hover:bg-gray-700 md:hidden"
-            >
-              {isFooterVisible ? "Hide Info" : "Show Info"}
-            </Button>
           </div>
         </div>
       </header>
@@ -45,7 +35,7 @@ export default function Home() {
       <section className="flex-1 flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-green-400 to-yellow-500 opacity-40 blur-lg"></div>
         <div className="container mx-auto px-4 text-center py-20 relative z-10">
-          <h2 className="text-4xl font-extrabold mb-4">
+          <h2 className="text-4xl font-extrabold mb-4 bg-gradient-to-r from-green-200 via-blue-200 to-purple-200 text-transparent bg-clip-text animate-gradient">
             Ace Your Next Interview with AI
           </h2>
           <p className="text-lg mb-8">
@@ -62,13 +52,9 @@ export default function Home() {
       </section>
 
       {/* Footer Section */}
-      <footer
-        className={`py-6 md:py-4 border-t border-gray-700 text-sm md:text-xs ${
-          isFooterVisible ? "block" : "hidden md:block"
-        }`}
-      >
+      <footer className="py-4 md:py-3 border-t border-gray-700 text-sm md:text-xs bg-black">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-4">
             <div className="text-center md:text-left mb-4 md:mb-0">
               <h2 className="text-lg font-bold mb-2">Contact Me</h2>
               <p>Email: phal.vihaan@gmail.com</p>
