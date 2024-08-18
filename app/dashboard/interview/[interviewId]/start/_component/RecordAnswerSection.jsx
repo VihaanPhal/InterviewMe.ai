@@ -116,6 +116,7 @@ function RecordAnswerSection({
               alt="Webcam Icon"
               className="absolute z-10"
             />
+
             <Webcam
               mirrored={true}
               className="absolute z-20 border-8 border-black rounded-lg"
