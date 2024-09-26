@@ -1,59 +1,50 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const Header = () => {
   const path = usePathname();
-  useEffect(() => {
-    console.log(path);
-  }, [path]);
+
+  const navItems = [
+    { name: "Dashboard", path: "/dashboard" },
+    { name: "Questions", path: "/dashboard/questions" },
+    { name: "Upgrade", path: "/dashboard/upgrade" },
+    { name: "How it works", path: "/dashboard/howitworks" },
+  ];
 
   return (
-    <div className="relative flex p-4 items-center justify-between bg-primary shadow-sm text-white">
-      <div className="relative z-10 font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-yellow-500">
-        InterviewMe.ai
+    <header className="bg-white dark:bg-gray-800 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center py-4">
+          <div className="flex items-center">
+            <Link href="/dashboard">
+              <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
+                InterviewMe.ai
+              </span>
+            </Link>
+          </div>
+          <nav className="hidden md:flex space-x-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.path}
+                className={`text-sm font-medium transition-colors duration-200 ease-in-out
+                  ${
+                    path === item.path
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                  }`}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
+          <UserButton />
+        </div>
       </div>
-      <ul className="hidden md:flex gap-6 relative z-10">
-        <li
-          className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 hover:font-bold transition-all
-
-          ${
-            path == "/dashboard" &&
-            "bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 font-bold"
-          }
-
-        `}
-        >
-          Dashboard
-        </li>
-        <li
-          className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 hover:font-bold transition-all
-
-          ${path == "/dashboard/questions" && "text-primary font-bold"}
-        `}
-        >
-          Questions
-        </li>
-        <li
-          className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 hover:font-bold transition-all
-
-          ${path == "/dashboard/upgrade" && "text-primary font-bold"}
-        `}
-        >
-          Upgrade
-        </li>
-        <li
-          className={`hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 hover:font-bold transition-all
-
-          ${path == "/dashboard/howitworks" && "text-primary font-bold"}
-        `}
-        >
-          How it works
-        </li>
-      </ul>
-      <UserButton className="relative z-10" />
-    </div>
+    </header>
   );
 };
 
