@@ -1,7 +1,6 @@
 import { Lightbulb, Volume2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 
 const QuestionsSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
   const [isClient, setIsClient] = useState(false);
@@ -22,12 +21,17 @@ const QuestionsSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
   return (
     mockInterviewQuestions && (
       <div>
-        <Progress
-          value={
-            (activeQuestionIndex + 1) * (100 / mockInterviewQuestions.length)
-          }
-          className="mb-4"
-        />
+        <div className="mb-4 bg-gray-200 rounded-full h-2.5">
+          <div
+            className="bg-blue-600 h-2.5 rounded-full"
+            style={{
+              width: `${
+                ((activeQuestionIndex + 1) / mockInterviewQuestions.length) *
+                100
+              }%`,
+            }}
+          ></div>
+        </div>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
             Question {activeQuestionIndex + 1} of{" "}
@@ -35,15 +39,14 @@ const QuestionsSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
           </h2>
           {isClient && (
             <Button
-              variant="outline"
-              size="icon"
               onClick={() =>
                 textToSpeech(
                   mockInterviewQuestions[activeQuestionIndex]?.Question
                 )
               }
             >
-              <Volume2 className="h-4 w-4" />
+              <Volume2 className="h-4 w-4 mr-2" />
+              Read Aloud
             </Button>
           )}
         </div>

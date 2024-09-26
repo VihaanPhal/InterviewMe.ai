@@ -10,7 +10,6 @@ import { db } from "@/utils/db";
 import moment from "moment";
 import { UserAnswer } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
-import { Textarea } from "@/components/ui/textarea";
 
 const Webcam = dynamic(() => import("react-webcam"), { ssr: false });
 
@@ -115,7 +114,7 @@ function RecordAnswerSection({
         )}
       </div>
       <div className="flex justify-between">
-        <Button variant="outline" onClick={() => onCameraToggle(!isCameraOn)}>
+        <Button onClick={() => onCameraToggle(!isCameraOn)}>
           {isCameraOn ? (
             <>
               <CameraOff className="mr-2 h-4 w-4" /> Turn Camera Off
@@ -126,11 +125,7 @@ function RecordAnswerSection({
             </>
           )}
         </Button>
-        <Button
-          onClick={StartStopRecording}
-          variant={isRecording ? "destructive" : "default"}
-          disabled={loading}
-        >
+        <Button onClick={StartStopRecording} disabled={loading}>
           {isRecording ? (
             <>
               <CircleStop className="mr-2 h-4 w-4" /> Stop Recording
@@ -142,11 +137,11 @@ function RecordAnswerSection({
           )}
         </Button>
       </div>
-      <Textarea
+      <textarea
         value={userAnswer}
         onChange={(e) => setUserAnswer(e.target.value)}
         placeholder="Your answer will appear here as you speak..."
-        className="w-full h-32"
+        className="w-full h-32 p-2 border rounded-md"
       />
       {error && <p className="text-red-500">Error: {error}</p>}
     </div>
