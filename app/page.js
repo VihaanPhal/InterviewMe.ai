@@ -70,7 +70,7 @@ export default function Home() {
             </Button>
           </nav>
           <Button
-            onClick={() => router.push("/sign-up")}
+            onClick={() => router.push("/dashboard")}
             className="bg-blue-500 text-white hover:bg-blue-600 transition-colors"
           >
             Get Started
@@ -188,7 +188,7 @@ export default function Home() {
             skills with InterviewMe.AI.
           </p>
           <Button
-            onClick={() => router.push("/sign-up")}
+            onClick={() => router.push("/dashboard")}
             className="bg-white text-blue-600 hover:bg-gray-100 transition-colors text-lg px-8 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             Get Started for Free <ArrowRight className="ml-2" />
