@@ -16,7 +16,6 @@ const Dashboard = () => {
               Create and manage your AI Mock Interviews
             </p>
           </div>
-          <UserButton />
         </div>
         <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">

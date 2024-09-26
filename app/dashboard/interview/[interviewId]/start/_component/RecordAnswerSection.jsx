@@ -1,27 +1,26 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import useSpeechToText from "react-hook-speech-to-text";
-import { CircleStop, Mic } from "lucide-react";
+import { Camera, CameraOff, CircleStop, Mic } from "lucide-react";
 import { toast } from "sonner";
 import { chatSession } from "@/utils/GeminiAiModel";
 import { db } from "@/utils/db";
 import moment from "moment";
-
 import { UserAnswer } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
+import { Textarea } from "@/components/ui/textarea";
 
-// Dynamically import the Webcam component to ensure it only renders on the client side
 const Webcam = dynamic(() => import("react-webcam"), { ssr: false });
 
 function RecordAnswerSection({
   mockInterviewQuestions,
   activeQuestionIndex,
   interviewData,
+  isCameraOn,
+  onCameraToggle,
 }) {
-  // Correct destructuring
   const {
     error,
     interimResult,
@@ -65,96 +64,91 @@ function RecordAnswerSection({
   };
 
   const UpdateUserAnswer = async () => {
-    console.log(userAnswer);
     setLoading(true);
-    const feedbackPrompt =
-      "Question" +
-      mockInterviewQuestions[activeQuestionIndex]?.Question +
-      ", User Answer: " +
-      userAnswer +
-      "depending on question and user answer for given interview question please give us rating for answer and feedback as area for improvement if any in just 3-5 lines to improve it in JSON format with rating field and feedback field. just give feedback nothing else";
-    const result = await chatSession.sendMessage(feedbackPrompt);
-    const mockJsonResp = result.response
-      .text()
-      .replace("```json", "")
-      .replace("```", "");
+    const feedbackPrompt = `Question: ${mockInterviewQuestions[activeQuestionIndex]?.Question}, User Answer: ${userAnswer}. Please provide a rating and feedback for the answer in JSON format with 'rating' and 'feedback' fields. The feedback should be 3-5 lines long and focus on areas for improvement.`;
 
-    console.log(mockJsonResp);
-    const JsonFeedbackResp = JSON.parse(mockJsonResp);
+    try {
+      const result = await chatSession.sendMessage(feedbackPrompt);
+      const mockJsonResp = result.response
+        .text()
+        .replace("```json", "")
+        .replace("```", "");
 
-    const resp = await db.insert(UserAnswer).values({
-      mockIdRef: interviewData?.mockId, // Ensure correct key usage
-      question: mockInterviewQuestions[activeQuestionIndex]?.Question,
-      correctAns: mockInterviewQuestions[activeQuestionIndex]?.Answer,
-      userAns: userAnswer,
-      feedback: JsonFeedbackResp.feedback,
-      rating: JsonFeedbackResp.rating,
-      userEmail: user?.primaryEmailAddress?.emailAddress,
-      createdAt: moment().format("DD-MM-yyyy"),
-    });
-    if (resp) {
-      toast("User Answer recorded successfully");
+      const JsonFeedbackResp = JSON.parse(mockJsonResp);
+
+      await db.insert(UserAnswer).values({
+        mockIdRef: interviewData?.mockId,
+        question: mockInterviewQuestions[activeQuestionIndex]?.Question,
+        correctAns: mockInterviewQuestions[activeQuestionIndex]?.Answer,
+        userAns: userAnswer,
+        feedback: JsonFeedbackResp.feedback,
+        rating: JsonFeedbackResp.rating,
+        userEmail: user?.primaryEmailAddress?.emailAddress,
+        createdAt: moment().format("DD-MM-yyyy"),
+      });
+
+      toast.success("Answer recorded successfully");
       setUserAnswer("");
       setResults([]);
+    } catch (error) {
+      console.error("Error updating user answer:", error);
+      toast.error("Failed to record answer. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setUserAnswer([]);
-    setLoading(false);
   };
 
   return (
-    <div className="flex items-center justify-center flex-col">
-      <div
-        className="relative flex flex-col justify-center items-center bg-gray-200 rounded-lg p-5 my-5"
-        style={{ height: 400, width: "100%" }}
-      >
-        {isClient ? (
-          <div className="relative flex justify-center items-center bg-gray-800 rounded-lg overflow-hidden w-full h-full">
-            <Image
-              src="/webcam.png"
-              width={200}
-              height={200}
-              alt="Webcam Icon"
-              className="absolute z-10"
-            />
-
-            <Webcam
-              mirrored={true}
-              className="absolute z-20 border-8 border-black rounded-lg"
-              style={{
-                height: "100%",
-                width: "100%",
-                objectFit: "cover",
-              }}
-              onUserMedia={() => console.log("Webcam accessed")}
-              onUserMediaError={(error) => console.error("Webcam error", error)}
-            />
-          </div>
+    <div className="space-y-6">
+      <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+        {isClient && isCameraOn ? (
+          <Webcam
+            mirrored
+            className="w-full h-full object-cover"
+            onUserMedia={() => console.log("Webcam accessed")}
+            onUserMediaError={(error) => console.error("Webcam error", error)}
+          />
         ) : (
-          <div style={{ width: 200, height: 200 }} /> // Placeholder to maintain layout
+          <div className="w-full h-full flex items-center justify-center bg-gray-200">
+            <CameraOff className="h-16 w-16 text-gray-400" />
+          </div>
         )}
       </div>
-      <Button
-        disabled={loading}
-        onClick={StartStopRecording}
-        className={`flex items-center justify-center w-48 px-4 py-2 text-white font-semibold rounded-md transition-all duration-300 ${
-          isRecording
-            ? "bg-red-600 hover:bg-red-700"
-            : "bg-red-500 hover:bg-red-600"
-        }`}
-        variant="outline"
-      >
-        {isRecording ? (
-          <div className="flex items-center space-x-2">
-            <CircleStop className="w-5 h-5 text-white" />
-            <span>Recording ...</span>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-2">
-            <Mic className="w-5 h-5 text-white" />
-            <span>Record Answer</span>
-          </div>
-        )}
-      </Button>
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={() => onCameraToggle(!isCameraOn)}>
+          {isCameraOn ? (
+            <>
+              <CameraOff className="mr-2 h-4 w-4" /> Turn Camera Off
+            </>
+          ) : (
+            <>
+              <Camera className="mr-2 h-4 w-4" /> Turn Camera On
+            </>
+          )}
+        </Button>
+        <Button
+          onClick={StartStopRecording}
+          variant={isRecording ? "destructive" : "default"}
+          disabled={loading}
+        >
+          {isRecording ? (
+            <>
+              <CircleStop className="mr-2 h-4 w-4" /> Stop Recording
+            </>
+          ) : (
+            <>
+              <Mic className="mr-2 h-4 w-4" /> Start Recording
+            </>
+          )}
+        </Button>
+      </div>
+      <Textarea
+        value={userAnswer}
+        onChange={(e) => setUserAnswer(e.target.value)}
+        placeholder="Your answer will appear here as you speak..."
+        className="w-full h-32"
+      />
+      {error && <p className="text-red-500">Error: {error}</p>}
     </div>
   );
 }

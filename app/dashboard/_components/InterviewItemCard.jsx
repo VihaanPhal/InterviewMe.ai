@@ -22,16 +22,6 @@ const InterviewItemCard = ({ interview }) => {
       <div className="flex space-x-2">
         <Button
           size="sm"
-          variant="outline"
-          className="w-full"
-          onClick={() =>
-            router.push(`/dashboard/interview/${interview.mockId}`)
-          }
-        >
-          Resume Interview
-        </Button>
-        <Button
-          size="sm"
           variant="default"
           className="w-full"
           onClick={() =>

@@ -1,6 +1,7 @@
 import { Lightbulb, Volume2 } from "lucide-react";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 const QuestionsSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
   const [isClient, setIsClient] = useState(false);
@@ -20,46 +21,43 @@ const QuestionsSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
 
   return (
     mockInterviewQuestions && (
-      <div className="p-5 border rounded-lg my-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {mockInterviewQuestions.map((question, index) => (
-            <div key={index}>
-              <h2
-                className={`p-2 rounded-full text-xs md:text-sm text-center cursor-pointer ${
-                  activeQuestionIndex === index
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                Question #{index + 1}
-              </h2>
-            </div>
-          ))}
+      <div>
+        <Progress
+          value={
+            (activeQuestionIndex + 1) * (100 / mockInterviewQuestions.length)
+          }
+          className="mb-4"
+        />
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">
+            Question {activeQuestionIndex + 1} of{" "}
+            {mockInterviewQuestions.length}
+          </h2>
+          {isClient && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                textToSpeech(
+                  mockInterviewQuestions[activeQuestionIndex]?.Question
+                )
+              }
+            >
+              <Volume2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
-        <h2 className="my-5 text-md md:text-lg">
-          <span className="font-bold">Question</span>:{" "}
+        <p className="text-lg mb-8">
           {mockInterviewQuestions[activeQuestionIndex]?.Question}
-        </h2>
-
-        {isClient && (
-          <Volume2
-            className="cursor-pointer"
-            onClick={() =>
-              textToSpeech(
-                mockInterviewQuestions[activeQuestionIndex]?.Question
-              )
-            }
-          />
-        )}
-
-        <div className="border rounded-lg p-5 bg-blue-100 text-blue-900 mt-20 my-10">
-          <h2 className="flex gap-2">
-            <Lightbulb />
-            <strong>Note:</strong>
-          </h2>
-          <h2 className="text-sm text-blue-600">
+        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Lightbulb className="text-blue-500" />
+            <strong className="text-blue-700">Note:</strong>
+          </div>
+          <p className="text-sm text-blue-600">
             {process.env.NEXT_PUBLIC_QUESTION_NOTE}
-          </h2>
+          </p>
         </div>
       </div>
     )

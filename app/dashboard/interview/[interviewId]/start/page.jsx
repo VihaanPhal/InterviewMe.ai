@@ -7,11 +7,14 @@ import QuestionsSection from "./_component/QuestionsSection";
 import RecordAnswerSection from "./_component/RecordAnswerSection";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion, AnimatePresence } from "framer-motion";
 
 const StartInterview = ({ params }) => {
   const [interviewData, setInterviewData] = useState(null);
   const [mockInterviewQuestions, setMockInterviewQuestions] = useState([]);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const [isCameraOn, setIsCameraOn] = useState(true);
 
   useEffect(() => {
     GetInterviewDetails();
@@ -28,49 +31,64 @@ const StartInterview = ({ params }) => {
     setInterviewData(result[0]);
   };
 
+  const handleCameraToggle = (isOn) => {
+    setIsCameraOn(isOn);
+  };
+
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
-        {/* Questions */}
-        <div className="p-4">
-          <QuestionsSection
-            mockInterviewQuestions={mockInterviewQuestions}
-            activeQuestionIndex={activeQuestionIndex}
-          />
-        </div>
-        {/* Answers */}
-        <div className="p-10">
-          {interviewData && interviewData.mockId ? (
-            <RecordAnswerSection
-              mockInterviewQuestions={mockInterviewQuestions}
-              activeQuestionIndex={activeQuestionIndex}
-              interviewData={interviewData}
-            />
-          ) : (
-            <p>Loading interview data...</p>
-          )}
-        </div>
-      </div>
-      <div className="flex justify-end gap-4">
-        {activeQuestionIndex > 0 && (
-          <Button
-            onClick={() => setActiveQuestionIndex(activeQuestionIndex - 1)}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Interview in Progress</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeQuestionIndex}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
           >
-            Previous
-          </Button>
-        )}
-        {activeQuestionIndex != mockInterviewQuestions?.length - 1 && (
+            <Card>
+              <CardContent className="p-6">
+                <QuestionsSection
+                  mockInterviewQuestions={mockInterviewQuestions}
+                  activeQuestionIndex={activeQuestionIndex}
+                />
+              </CardContent>
+            </Card>
+          </motion.div>
+        </AnimatePresence>
+        <Card>
+          <CardContent className="p-6">
+            {interviewData && interviewData.mockId ? (
+              <RecordAnswerSection
+                mockInterviewQuestions={mockInterviewQuestions}
+                activeQuestionIndex={activeQuestionIndex}
+                interviewData={interviewData}
+                isCameraOn={isCameraOn}
+                onCameraToggle={handleCameraToggle}
+              />
+            ) : (
+              <p>Loading interview data...</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      <div className="flex justify-between mt-8">
+        <Button
+          onClick={() => setActiveQuestionIndex(activeQuestionIndex - 1)}
+          disabled={activeQuestionIndex === 0}
+        >
+          Previous
+        </Button>
+        {activeQuestionIndex !== mockInterviewQuestions?.length - 1 ? (
           <Button
             onClick={() => setActiveQuestionIndex(activeQuestionIndex + 1)}
           >
             Next
           </Button>
-        )}
-        {activeQuestionIndex == mockInterviewQuestions?.length - 1 && (
-          <Link
-            href={"/dashboard/interview/" + interviewData?.mockId + "/feedback"}
-          >
-            <Button>End interview</Button>
+        ) : (
+          <Link href={`/dashboard/interview/${interviewData?.mockId}/feedback`}>
+            <Button>End Interview</Button>
           </Link>
         )}
       </div>
